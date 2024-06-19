@@ -2,7 +2,10 @@ from .logs import Log
 from .sap import SAPManipulation
 from getpass import getuser
 from datetime import datetime
+from .functions import fechar_excel
 import os
+
+
 
 class FBL3N(SAPManipulation):
     @property
@@ -13,11 +16,13 @@ class FBL3N(SAPManipulation):
         super().__init__(using_active_conection=True)
         
     @SAPManipulation.start_SAP
-    def gerar_relatorio(self, *, path:str=f"C:\\Users\\{getuser()}\\Downloads", name:str=datetime.now().strftime("relatorio_partes_relacionadas_%d%m%Y%H%M%S.xlsx")) -> str:
+    def gerar_relatorio(self, *,
+                        path:str=f"C:\\Users\\{getuser()}\\Downloads", name:str=datetime.now().strftime("relatorio_partes_relacionadas_%d%m%Y%H%M%S.xlsx")
+                        ) -> str:
         """Executa a transação no sap e gera o relatorio em seguida salva no caminho especificado e retorna o caminho de onde o arquivo foi salvo
 
         Args:
-            path (str, optional): caminho onde será salvo o arquivo. Defaults to f"C:\Users\{getuser()}\Downloads".
+            path (str, optional): caminho onde será salvo o arquivo. Defaults to f"C:\\Users\\{getuser()}\\Downloads".
             name (str, optional): nome do arquivo que será salvo. Defaults to datetime.now().strftime("relatorio_partes_relacionadas_%d%m%Y%H%M%S.xlsx").
 
         Raises:
@@ -55,7 +60,10 @@ class FBL3N(SAPManipulation):
         except:
             pass
         
-        return os.path.join(path, name)
+        result:str = os.path.join(path, name)
+        fechar_excel(result, multiplas_tentativas=True)
+        return result
+    
 
 if __name__ == "__main__":
     pass

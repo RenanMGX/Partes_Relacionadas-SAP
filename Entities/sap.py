@@ -55,6 +55,7 @@ class SAPManipulation():
         return wrap
     
     def conectar_sap(self) -> None:
+        self.__session: win32com.client.CDispatch
         if not self.using_active_conection:
             try:
                 if not self._verificar_sap_aberto():
@@ -64,7 +65,7 @@ class SAPManipulation():
                 SapGuiAuto: win32com.client.CDispatch = win32com.client.GetObject("SAPGUI")# type: ignore
                 application: win32com.client.CDispatch = SapGuiAuto.GetScriptingEngine# type: ignore
                 connection = application.OpenConnection(self.__ambiente, True) # type: ignore
-                self.__session: win32com.client.CDispatch = connection.Children(0)# type: ignore
+                self.__session = connection.Children(0)# type: ignore
                 
                 self.session.findById("wnd[0]/usr/txtRSYST-BNAME").text = self.__user # Usuario
                 self.session.findById("wnd[0]/usr/pwdRSYST-BCODE").text = self.__password # Senha
@@ -82,7 +83,7 @@ class SAPManipulation():
                 self.SapGuiAuto: win32com.client.CDispatch = win32com.client.GetObject("SAPGUI")
                 self.application: win32com.client.CDispatch = self.SapGuiAuto.GetScriptingEngine
                 self.connection: win32com.client.CDispatch = self.application.Children(0)
-                self.__session: win32com.client.CDispatch = self.connection.Children(0)
+                self.__session = self.connection.Children(0)
                 
             except Exception as error:
                 if "self.connection: win32com.client.CDispatch = self.application.Children(0)" in traceback.format_exc():
