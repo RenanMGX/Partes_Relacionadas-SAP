@@ -2,6 +2,7 @@ import xlwings as xw
 from xlwings.main import Book
 import os
 from time import sleep
+import traceback
 
 def fechar_excel(caminho:str, *, 
                 trace_back:bool=False,
@@ -19,18 +20,28 @@ def fechar_excel(caminho:str, *,
                 for app_open in app.books:
                     app_open:Book
                     if app_open.name in caminho:
+                        print(f"fechou {app_open.name}")
                         app_open.close()
+                        
                         return True
             if not multiplas_tentativas:
                 break
             sleep(1)
         return False    
     except Exception as error:
-        print(f"não foi possivel fechar o {caminho=}\nError: {error=}")
+        print(f"não foi possivel fechar o {caminho=}\nError: {traceback.format_exc()}")
         if trace_back:
             raise error
         return error
+    
+def excel_abertos():
+    print("lista de abertos:")
+    for app in xw.apps:
+        for app_open in app.books:
+            app_open:Book
+            print(f"{app_open.name} - ainda aberto!")
                 
 
 if __name__ == "__main__":
-    fechar_excel(r"C:\Users\renan.oliveira\Downloads\relatorio_partes_relacionadas_19062024182439.xlsx", multiplas_tentativas=True)
+    excel_abertos()
+    fechar_excel("Pasta1")

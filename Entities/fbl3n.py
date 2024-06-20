@@ -2,7 +2,7 @@ from .logs import Log
 from .sap import SAPManipulation
 from getpass import getuser
 from datetime import datetime
-from .functions import fechar_excel
+from .functions import fechar_excel, excel_abertos
 import os
 
 
@@ -61,7 +61,10 @@ class FBL3N(SAPManipulation):
             pass
         
         result:str = os.path.join(path, name)
-        fechar_excel(result, multiplas_tentativas=True)
+        
+        fechar_excel(result, multiplas_tentativas=True, wait=2)
+        
+        
         return result
     
 
