@@ -22,6 +22,8 @@ def fechar_excel(caminho:str, *,
                     if app_open.name in caminho:
                         print(f"fechou {app_open.name}")
                         app_open.close()
+                        if len(xw.apps) == 0:
+                            app.kill()
                         
                         return True
             if not multiplas_tentativas:
@@ -43,5 +45,4 @@ def excel_abertos():
                 
 
 if __name__ == "__main__":
-    excel_abertos()
-    fechar_excel("Pasta1")
+    print(len(xw.apps))

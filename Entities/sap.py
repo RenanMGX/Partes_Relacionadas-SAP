@@ -80,6 +80,9 @@ class SAPManipulation():
                     raise ConnectionError(f"não foi possivel se conectar ao SAP motivo: {type(error).__class__} -> {error}")
         else:
             try:
+                if not self._verificar_sap_aberto():
+                    raise Exception("SAP está fechado!")
+                
                 self.SapGuiAuto: win32com.client.CDispatch = win32com.client.GetObject("SAPGUI")
                 self.application: win32com.client.CDispatch = self.SapGuiAuto.GetScriptingEngine
                 self.connection: win32com.client.CDispatch = self.application.Children(0)
@@ -87,6 +90,8 @@ class SAPManipulation():
                 
             except Exception as error:
                 if "self.connection: win32com.client.CDispatch = self.application.Children(0)" in traceback.format_exc():
+                    raise Exception("SAP está fechado!")
+                elif "SAP está fechado!" in traceback.format_exc():
                     raise Exception("SAP está fechado!")
                 else:
                     self.log.register_error()

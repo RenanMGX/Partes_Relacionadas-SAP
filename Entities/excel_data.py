@@ -49,12 +49,12 @@ class ExcelData:
         lista_remover = self.preparar_lista_alimentacao(mod='Remover')
         lista_acrescentar = self.preparar_lista_alimentacao(mod='Acrescentar')
         
-        nome_para_salvar = self._caminho_salvar()
+        
         app = xw.App(visible=False)
         with app.books.open(modelo_file_path_copy)as wb:
             self._alimentar_celular(wb=wb,sheet="B.I. (ajuste -)",lista_alimentar=lista_remover)
             self._alimentar_celular(wb=wb,sheet="B.I. (ajuste +)",lista_alimentar=lista_acrescentar)
-            wb.save(nome_para_salvar)
+            wb.save(self._caminho_salvar())
         fechar_excel(modelo_file_path_copy)
         os.unlink(modelo_file_path_copy)
     
