@@ -2,13 +2,16 @@ import os
 from getpass import getuser
 import pandas as pd
 import xlwings as xw
+from xlwings.main import Sheet
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from shutil import copy2
 import numpy as nb
 from typing import Literal
-from .functions import fechar_excel
+from .functions import fechar_excel, Classific
+from .functions import ultimo_dia_mes as obter_ultimo_dia_mes
 from tkinter import filedialog
+import locale; locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
 class ExcelData:
     @property
@@ -20,8 +23,12 @@ class ExcelData:
         df_base_temp = df_base_temp[df_base_temp['Divisão'] != ""]
         return df_base_temp
     
+    @property
+    def date(self) -> datetime:
+        return self.__date    
     
-    def __init__(self, 
+    def __init__(self, *,
+                 date:datetime,
                  dados_entrada_path:str|pd.DataFrame,
                  modelo_file:str="MODELO BATCH INPUT.xlsx"
                  ) -> None:
@@ -30,6 +37,7 @@ class ExcelData:
         if isinstance(dados_entrada_path, str):
             if os.path.exists(dados_entrada_path):
                 if dados_entrada_path.endswith(".xlsx"):
+                    fechar_excel(dados_entrada_path)
                     self.__df_base = pd.read_excel(dados_entrada_path, dtype=str)
                 else:
                     raise TypeError(f"é permitido apenas arquivos Excel")
@@ -39,6 +47,7 @@ class ExcelData:
             self.__df_base = dados_entrada_path
         
         self.__modelo_file_path:str = modelo_file
+        self.__date:datetime = date
     
     #metodo Principal    
     def alimentar_batch_input(self):
@@ -46,14 +55,14 @@ class ExcelData:
         modelo_file_path_copy = modelo_file_path.replace(".xlsx", "_temp.xlsx")
         copy2(modelo_file_path, modelo_file_path_copy)
         
-        lista_remover = self.preparar_lista_alimentacao(mod='Remover')
-        lista_acrescentar = self.preparar_lista_alimentacao(mod='Acrescentar')
+        lista_intercompany = self._preparar_lista_alimentacao(mod='Intercompany')
+        lista_passivo = self._preparar_lista_alimentacao(mod='Passivo')
         
-        
+        fechar_excel(modelo_file_path_copy) 
         app = xw.App(visible=False)
         with app.books.open(modelo_file_path_copy)as wb:
-            self._alimentar_celular(wb=wb,sheet="B.I. (ajuste -)",lista_alimentar=lista_remover)
-            self._alimentar_celular(wb=wb,sheet="B.I. (ajuste +)",lista_alimentar=lista_acrescentar)
+            self._alimentar_celular(wb=wb,sheet="B.I. Intercompany",lista_alimentar=lista_intercompany)
+            self._alimentar_celular(wb=wb,sheet="B.I. Passivo",lista_alimentar=lista_passivo)
             wb.save(self._caminho_salvar())
         fechar_excel(modelo_file_path_copy)
         os.unlink(modelo_file_path_copy)
@@ -62,14 +71,14 @@ class ExcelData:
         options = {}
         options['defaultextension'] = ".xlsx"
         options['filetypes'] = [("Arquivos Excel", "*.xlsx"), ("Todos os arquivos", "*.*")]
-        options['initialfile'] = "MODELO BATCH INPUT.xlsx"
+        options['initialfile'] = f"BATCH INPUT {self.date.strftime('%B %Y')}.xlsx"
         arquivo_salvar = filedialog.asksaveasfilename(**options)
         if  arquivo_salvar == "":
             return f"C:\\Users\\{getuser()}\\Downloads\\MODELO BATCH INPUT.xlsx"
         return arquivo_salvar
     
     def _alimentar_celular(self, *, wb, sheet:str, lista_alimentar:dict):
-        ws = wb.sheets[sheet] 
+        ws:Sheet = wb.sheets[sheet] 
         #Alimentar Planilha   
         ws.range(f'A2').value = [[x] for x in lista_alimentar["sequencial"]]
         ws.range(f'B2').value = [[x] for x in lista_alimentar["ultimo_dia_mes"]]
@@ -85,14 +94,14 @@ class ExcelData:
         ws.range(f'M2').value = [[x] for x in lista_alimentar["Conta"]]
         ws.range(f'U2').value = [[x] for x in lista_alimentar["texto"]]
     
-    def preparar_lista_alimentacao(self, *,
-                                   mod:Literal["Remover", "Acrescentar"]
+    def _preparar_lista_alimentacao(self, *,
+                                   mod:Literal["Intercompany", "Passivo"]
                                    ):
         
         #df_base_menor = df_base[df_base['Montante em moeda interna'] < "0"]
         sequencial = 0
         linha = 1
-        ultimo_dia_mes = self.get_ultimo_dia_mes().strftime('%d.%m.%Y')
+        ultimo_dia_mes = obter_ultimo_dia_mes(self.date ,forstr='%d.%m.%Y')
         lista_alimentar:dict = {
             "sequencial":[],
             "ultimo_dia_mes": [],
@@ -106,43 +115,54 @@ class ExcelData:
             "Conta": [],
             "texto" : []
         }
-        for row,dados in self.df_base.iterrows():
+        
+        df:pd.DataFrame
+        if mod == 'Intercompany':
+            df = self.df_base[self.df_base['Texto'].str.contains('Intercompany', na=False)]
+        elif mod == 'Passivo':
+            df = self.df_base[~self.df_base['Texto'].str.contains('Intercompany', na=False)]
+        else:
+            raise Exception(f"incorrect {mod=} selection")
+        
+        for row,dados in df.iterrows():
             sequencial += 1
             
-            #Credito
+            montante = Classific(dados['Montante em moeda interna'])
+            
+            #Linha 1
             lista_alimentar["sequencial"].append(sequencial)
             lista_alimentar["ultimo_dia_mes"].append(ultimo_dia_mes)
             lista_alimentar["Empresa"].append(dados['Empresa'])
             lista_alimentar["Divisão"].append(dados['Divisão'])  
             lista_alimentar["tipo_documento"].append('AB') 
             lista_alimentar["Texto cabeçalho/Referencia"].append('RECLASSIFICAÇÃO PARTES RELACIONAS')
-            lista_alimentar["Chave do Lançamento"].append('21') 
-            lista_alimentar["valor"].append(dados['Montante em moeda interna']) 
-            lista_alimentar["tipo de conta"].append('K') 
-            lista_alimentar["Conta"].append(dados['Fornecedor'] if mod == "Remover" else self.tratar_conta(dados['Conta']))
+            lista_alimentar["Chave do Lançamento"].append(montante.chave_primaria) 
+            lista_alimentar["valor"].append(montante.value) 
+            lista_alimentar["tipo de conta"].append(montante.tipo_conta_primeira) 
+            lista_alimentar["Conta"].append(dados['Fornecedor'] if montante.tipo_conta_primeira == "K" else self._tratar_conta(dados['Conta']))
             lista_alimentar["texto"].append(dados['Texto'])
             
-            #debito
+            #Linha 2
             lista_alimentar["sequencial"].append(sequencial)
             lista_alimentar["ultimo_dia_mes"].append("")
             lista_alimentar["Empresa"].append("")
             lista_alimentar["Divisão"].append(dados['Divisão'])  
             lista_alimentar["tipo_documento"].append('')
             lista_alimentar["Texto cabeçalho/Referencia"].append('')
-            lista_alimentar["Chave do Lançamento"].append('50') 
-            lista_alimentar["valor"].append(dados['Montante em moeda interna']) 
-            lista_alimentar["tipo de conta"].append('S') 
-            lista_alimentar["Conta"].append(self.tratar_conta(dados['Conta']) if mod == "Remover" else dados['Fornecedor'])
+            lista_alimentar["Chave do Lançamento"].append(montante.chave_secundaria) 
+            lista_alimentar["valor"].append(montante.value) 
+            lista_alimentar["tipo de conta"].append(montante.tipo_conta_secundaria) 
+            lista_alimentar["Conta"].append(dados['Fornecedor'] if montante.tipo_conta_secundaria == "K" else self._tratar_conta(dados['Conta']))
             lista_alimentar["texto"].append(dados['Texto']) 
         
         return lista_alimentar         
     
-    def get_ultimo_dia_mes(self) -> datetime:
-        now = datetime.now()
-        date_temp = datetime(year=now.year, month=(now + relativedelta(months=1)).month, day=1)
-        return date_temp - relativedelta(days=1)
+    # def get_ultimo_dia_mes(self) -> datetime:
+    #     now = datetime.now()
+    #     date_temp = datetime(year=now.year, month=(now + relativedelta(months=1)).month, day=1)
+    #     return date_temp - relativedelta(days=1)
 
-    def tratar_conta(self, conta):
+    def _tratar_conta(self, conta):
         conta_temp = str(conta)
         if len(conta_temp) == 10:
             return f"12{conta_temp[2:]}"

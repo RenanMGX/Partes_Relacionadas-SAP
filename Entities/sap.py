@@ -7,7 +7,6 @@ import subprocess
 from time import sleep
 import traceback
 
-
 class SAPManipulation():
     @property
     def ambiente(self) -> str:
@@ -30,9 +29,7 @@ class SAPManipulation():
         self.__user:str = user
         self.__password:str = password
         self.__ambiente:str = ambiente
-        
-        
-    
+         
     #decorador
     @staticmethod
     def start_SAP(f):
@@ -126,8 +123,7 @@ class SAPManipulation():
     @start_SAP
     def _teste(self):
         print("testado")
-    
-    
+  
 if __name__ == "__main__":
     pass
     #crd = Credential("SAP_QAS").load()
