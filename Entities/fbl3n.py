@@ -34,6 +34,7 @@ class FBL3N(SAPManipulation):
         
         name:str=datetime.now().strftime("relatorio_partes_relacionadas_%d%m%Y%H%M%S.xlsx")
         
+        print("aqui <-------------------------------------")
         try:
             if not os.path.exists(path):
                 os.makedirs(path)
@@ -77,6 +78,8 @@ class FBL3N(SAPManipulation):
         result:str = os.path.join(path, name)
         
         fechar_excel(result, multiplas_tentativas=True, wait=2)
+        
+        self.fechar_sap()
         
         return result
 

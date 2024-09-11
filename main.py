@@ -1,7 +1,6 @@
 import os
 import traceback
-
-from Entities.dependencies.functions import P, Functions
+import sys
 from Entities.dependencies.logs import Logs
 from Entities.fbl3n import FBL3N
 from Entities.excel_data import ExcelData
@@ -9,7 +8,7 @@ from typing import Literal
 from Entities.functions import fechar_excel, relativedelta
 from datetime import datetime
 from Entities.interface import Interface, QtWidgets, QtGui
-import sys
+from Entities.dependencies.functions import P, Functions
 
 
 class Execute(Interface):

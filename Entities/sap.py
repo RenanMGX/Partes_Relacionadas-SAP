@@ -16,7 +16,13 @@ class SAPManipulation():
     @property
     def session(self) -> win32com.client.CDispatch:
         return self.__session
-    
+    @session.deleter
+    def session(self):
+        try:
+            del self.__session
+        except:
+            pass
+        
     @property
     def log(self) -> Logs:
         return Logs()
@@ -105,6 +111,7 @@ class SAPManipulation():
                 self.session.findById('wnd[1]/usr/btnSPOP-OPTION1').press()
             except:
                 self.session.findById('wnd[2]/usr/btnSPOP-OPTION1').press()
+                del self.__session
         except Exception as error:
             print(f"não foi possivel fechar o SAP {type(error)} | {error}")
 

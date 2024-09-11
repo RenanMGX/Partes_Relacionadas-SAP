@@ -46,6 +46,7 @@ class Interface(QtWidgets.QMainWindow):
         self.janela_1_label_textoInfor.setGeometry(QtCore.QRect(50, 290, 391, 51))
         self.janela_1_label_textoInfor.setAlignment(QtCore.Qt.AlignCenter) #type: ignore
         self.janela_1_label_textoInfor.setObjectName("janela_1_label_textoInfor")
+        self.janela_1_label_textoInfor.setWordWrap(True)
         
         self.Janelas.addWidget(self.janela_1)
         
@@ -78,11 +79,11 @@ class Interface(QtWidgets.QMainWindow):
     def ir_pagina_2(self):
         self.Janelas.setCurrentIndex(1)
     
-    def openFileNameDialog(self):
-        options = QtWidgets.QFileDialog.Options()
-        defaultFileName = "Batch.xlsx"
-        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Salvar Arquivo", defaultFileName, "Planilhas Excel (*.xlsx)", options=options)
-        return fileName
+    # def openFileNameDialog(self):
+    #     options = QtWidgets.QFileDialog.Options()
+    #     defaultFileName = "Batch.xlsx"
+    #     fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Salvar Arquivo", defaultFileName, "Planilhas Excel (*.xlsx)", options=options)
+    #     return fileName
 
 
 if __name__ == "__main__":
