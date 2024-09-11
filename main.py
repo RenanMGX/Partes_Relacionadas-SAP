@@ -36,7 +36,6 @@ class Execute(Interface):
         
         #self.__date:datetime = date
         self.__modelo_file_name:str = "MODELO BATCH INPUT.xlsx"
-        self.__fbl3n:FBL3N = FBL3N()
         super().__init__(version="1.0") # <--------------------------------- Alterar Versão antes de compilar
         self.setupUi()
         self.__initial_config()
@@ -63,7 +62,7 @@ class Execute(Interface):
         self.showMinimized()
         self.janela_1_label_textoInfor.setText("")
         try:
-            relatorio_path = self.__fbl3n.gerar_relatorio(date=self.date)
+            relatorio_path = FBL3N().gerar_relatorio(date=self.date)
             
             self.__files_created = ExcelData(date=self.date,dados_entrada_path=relatorio_path, modelo_file=self.modelo_path).alimentar_batch_input()
             

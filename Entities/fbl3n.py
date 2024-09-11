@@ -34,7 +34,6 @@ class FBL3N(SAPManipulation):
         
         name:str=datetime.now().strftime("relatorio_partes_relacionadas_%d%m%Y%H%M%S.xlsx")
         
-        print("aqui <-------------------------------------")
         try:
             if not os.path.exists(path):
                 os.makedirs(path)
@@ -44,9 +43,12 @@ class FBL3N(SAPManipulation):
         if not name.endswith(".xlsx"):
             name += ".xlsx"
         
-        self.session.findById("wnd[0]/tbar[0]/okcd").text = "/n fbl3n"
-        self.session.findById("wnd[0]").sendVKey(0)
-        self.session.findById("wnd[0]/tbar[1]/btn[17]").press()
+        try:
+            self.session.findById("wnd[0]/tbar[0]/okcd").text = "/n fbl3n"
+            self.session.findById("wnd[0]").sendVKey(0)
+            self.session.findById("wnd[0]/tbar[1]/btn[17]").press()
+        except:
+            raise Exception("O Sap está Fechado!")
         self.session.findById("wnd[1]/usr/txtV-LOW").text = "RAZÃO 2204"
         self.session.findById("wnd[1]/usr/txtENAME-LOW").text = "edias"
         self.session.findById("wnd[1]/tbar[0]/btn[8]").press() 
@@ -79,7 +81,6 @@ class FBL3N(SAPManipulation):
         
         fechar_excel(result, multiplas_tentativas=True, wait=2)
         
-        self.fechar_sap()
         
         return result
 
