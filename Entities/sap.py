@@ -1,4 +1,4 @@
-from .logs import Log
+from Entities.dependencies.logs import Logs
 from getpass import getuser
 import win32com.client
 from datetime import datetime
@@ -6,6 +6,7 @@ import psutil
 import subprocess
 from time import sleep
 import traceback
+
 
 class SAPManipulation():
     @property
@@ -17,8 +18,8 @@ class SAPManipulation():
         return self.__session
     
     @property
-    def log(self) -> Log:
-        return Log(self.__class__.__name__)
+    def log(self) -> Logs:
+        return Logs()
     
     @property
     def using_active_conection(self) -> bool:
@@ -73,7 +74,7 @@ class SAPManipulation():
                 if "connection = application.OpenConnection(self.__ambiente, True)" in traceback.format_exc():
                     raise Exception("SAP está fechado!")
                 else:
-                    self.log.register_error()
+                    self.log.register(status='Error', description=str(error), exception=traceback.format_exc())
                     raise ConnectionError(f"não foi possivel se conectar ao SAP motivo: {type(error).__class__} -> {error}")
         else:
             try:
@@ -91,7 +92,7 @@ class SAPManipulation():
                 elif "SAP está fechado!" in traceback.format_exc():
                     raise Exception("SAP está fechado!")
                 else:
-                    self.log.register_error()
+                    self.log.register(status='Error', description=str(error), exception=traceback.format_exc())
 
     #@usar_sap
     def fechar_sap(self):

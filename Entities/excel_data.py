@@ -12,6 +12,7 @@ from .functions import fechar_excel, Classific
 from .functions import ultimo_dia_mes as obter_ultimo_dia_mes
 from tkinter import filedialog
 import locale; locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+from PyQt5.QtWidgets import QFileDialog
 
 class ExcelData:
     @property
@@ -51,6 +52,7 @@ class ExcelData:
     
     #metodo Principal    
     def alimentar_batch_input(self):
+        file_name_saved = self._caminho_salvar()
         modelo_file_path = self.__modelo_file_path
         modelo_file_path_copy = modelo_file_path.replace(".xlsx", "_temp.xlsx")
         copy2(modelo_file_path, modelo_file_path_copy)
@@ -63,18 +65,25 @@ class ExcelData:
         with app.books.open(modelo_file_path_copy)as wb:
             self._alimentar_celular(wb=wb,sheet="B.I. Intercompany",lista_alimentar=lista_intercompany)
             self._alimentar_celular(wb=wb,sheet="B.I. Passivo",lista_alimentar=lista_passivo)
-            wb.save(self._caminho_salvar())
+            wb.save(file_name_saved)
         fechar_excel(modelo_file_path_copy)
         os.unlink(modelo_file_path_copy)
+        return {"file_name_saved":file_name_saved, "modelo_file_path_copy":modelo_file_path_copy}
     
     def _caminho_salvar(self):
-        options = {}
-        options['defaultextension'] = ".xlsx"
-        options['filetypes'] = [("Arquivos Excel", "*.xlsx"), ("Todos os arquivos", "*.*")]
-        options['initialfile'] = f"BATCH INPUT {self.date.strftime('%B %Y')}.xlsx"
-        arquivo_salvar = filedialog.asksaveasfilename(**options)
-        if  arquivo_salvar == "":
-            return f"C:\\Users\\{getuser()}\\Downloads\\MODELO BATCH INPUT.xlsx"
+        # options = {}
+        # options['defaultextension'] = ".xlsx"
+        # options['filetypes'] = [("Arquivos Excel", "*.xlsx"), ("Todos os arquivos", "*.*")]
+        # options['initialfile'] = f"BATCH INPUT {self.date.strftime('%B %Y')}.xlsx"
+        # arquivo_salvar = filedialog.asksaveasfilename(**options)
+        # if  arquivo_salvar == "":
+        #     return f"C:\\Users\\{getuser()}\\Downloads\\MODELO BATCH INPUT.xlsx"
+        options = QFileDialog.Options()
+        defaultFileName = f"BATCH INPUT {self.date.strftime('%B %Y')}.xlsx"
+        arquivo_salvar, _ = QFileDialog.getSaveFileName(None, "Salvar Arquivo", defaultFileName, "Planilhas Excel (*.xlsx)", options=options)
+        print(arquivo_salvar)
+        if not arquivo_salvar:
+            raise FileNotFoundError("tela para salvar o arquivo foi encerrada sem selecionar o arquivo!")
         return arquivo_salvar
     
     def _alimentar_celular(self, *, wb, sheet:str, lista_alimentar:dict):
@@ -127,7 +136,7 @@ class ExcelData:
         for row,dados in df.iterrows():
             sequencial += 1
             
-            montante = Classific(dados['Montante em moeda interna'])
+            montante = Classific(dados['Montante em moeda interna'], inverter_nega_posi=True)
             
             #Linha 1
             lista_alimentar["sequencial"].append(sequencial)
@@ -162,12 +171,14 @@ class ExcelData:
     #     date_temp = datetime(year=now.year, month=(now + relativedelta(months=1)).month, day=1)
     #     return date_temp - relativedelta(days=1)
 
-    def _tratar_conta(self, conta):
+    @staticmethod
+    def _tratar_conta(conta):
         conta_temp = str(conta)
         if len(conta_temp) == 10:
-            return f"12{conta_temp[2:]}"
+            return f"1202{conta_temp[4:]}"
         else:
             return conta
 
 if __name__ == "__main__":
     pass
+    #print(ExcelData._tratar_conta("2204010018"))

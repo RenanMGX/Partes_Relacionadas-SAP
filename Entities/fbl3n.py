@@ -1,4 +1,5 @@
-from .logs import Log
+import traceback
+from Entities.dependencies.logs import Logs
 from .sap import SAPManipulation
 from getpass import getuser
 from datetime import datetime
@@ -8,7 +9,7 @@ import os
 class FBL3N(SAPManipulation):
     @property
     def log(self):
-        return Log(self.__class__.__name__)
+        return Logs()
     
     def __init__(self,) -> None:
         super().__init__(using_active_conection=True)
@@ -36,8 +37,8 @@ class FBL3N(SAPManipulation):
         try:
             if not os.path.exists(path):
                 os.makedirs(path)
-        except:
-            self.log.register_error()
+        except Exception as error:
+            self.log.register(status='Error', description=str(error), exception=traceback.format_exc())
             raise NotADirectoryError("erro ao validar caminho!")
         if not name.endswith(".xlsx"):
             name += ".xlsx"

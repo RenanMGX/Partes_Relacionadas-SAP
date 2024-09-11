@@ -5,6 +5,9 @@ import traceback
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
+from Entities.dependencies.functions import P
+
+
 def fechar_excel(caminho:str, *, 
                 trace_back:bool=False,
                 wait:int=0,
@@ -21,7 +24,7 @@ def fechar_excel(caminho:str, *,
                 for app_open in app.books:
                     app_open:Book
                     if app_open.name in caminho:
-                        print(f"fechou {app_open.name}")
+                        print(P(f"fechou {app_open.name}"))
                         app_open.close()
                         if len(xw.apps) == 0:
                             app.kill()
@@ -32,7 +35,7 @@ def fechar_excel(caminho:str, *,
             sleep(1)
         return False    
     except Exception as error:
-        print(f"não foi possivel fechar o {caminho=}\nError: {traceback.format_exc()}")
+        print(P(f"não foi possivel fechar o {caminho=}\nError: {traceback.format_exc()}"))
         if trace_back:
             raise error
         return error
@@ -93,16 +96,16 @@ class Classific:
         else:
             return 'S'
         
-        
-    
-    def __init__(self, value:str|int|float) -> None:
+    def __init__(self, value:str|int|float, *, inverter_nega_posi:bool=False) -> None:
+        if inverter_nega_posi:
+            value = -float(value)
         self.__value = value
         new_value:float = float(value)
         self.__newValue:int|float = new_value
     
 
 if __name__ == "__main__":
-    num = Classific("100")
+    num = Classific(-100, inverter_nega_posi=True)
     print(num.value)
     print(num.chave_primaria,num.chave_secundaria)
     print(num.tipo_conta_primeira,num.tipo_conta_secundaria)
