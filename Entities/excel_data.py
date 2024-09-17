@@ -53,7 +53,6 @@ class ExcelData:
     #metodo Principal    
     def alimentar_batch_input(self):
         file_name_saved = self._caminho_salvar()
-        print(file_name_saved)
         modelo_file_path = self.__modelo_file_path
         modelo_file_path_copy = modelo_file_path.replace(".xlsx", "_temp.xlsx")
         copy2(modelo_file_path, modelo_file_path_copy)
@@ -139,7 +138,7 @@ class ExcelData:
         for row,dados in df.iterrows():
             sequencial += 1
             
-            montante = Classific(dados['Montante em moeda interna'], sem_negativo=True)
+            montante = Classific(dados['Montante em moeda interna'])
             
             #Linha 1
             lista_alimentar["sequencial"].append(sequencial)

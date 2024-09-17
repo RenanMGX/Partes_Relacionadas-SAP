@@ -71,15 +71,23 @@ class Classific:
     @property
     def chave_primaria(self):
         if self.positivo:
+            if self.__conta_virada:
+                return '40'
             return '50'
         else:
+            if self.__conta_virada:
+                return '31'
             return '21'
     
     @property
     def chave_secundaria(self):
         if self.positivo:
+            if self.__conta_virada:
+                return '31'
             return '21'
         else:
+            if self.__conta_virada:
+                return '40'
             return '50'
         
     @property
@@ -96,18 +104,29 @@ class Classific:
         else:
             return 'S'
         
-    def __init__(self, value:str|int|float, *, sem_negativo:bool=False) -> None:
-        if sem_negativo:
-            value_temp = float(value)
-            if value_temp < 0:
-                value = -float(value)
+    def __init__(self, value:str|int|float) -> None:
+        self.__conta_virada:bool = False
+        if float(value) < 0:
+            value = -float(value)
+        else:
+            value = float(value)
+            self.__conta_virada = True
         self.__value = value
         new_value:float = float(value)
         self.__newValue:int|float = new_value
     
 
 if __name__ == "__main__":
-    num = Classific(-100, sem_negativo=True)
+    num = Classific(-100)
     print(num.value)
     print(num.chave_primaria,num.chave_secundaria)
     print(num.tipo_conta_primeira,num.tipo_conta_secundaria)
+    print(f"{num._Classific__conta_virada=}")# type: ignore
+    
+    print("----------------")
+    num = Classific(100)
+    print(num.value)
+    print(num.chave_primaria,num.chave_secundaria)
+    print(num.tipo_conta_primeira,num.tipo_conta_secundaria)
+    print(f"{num._Classific__conta_virada=}")# type: ignore
+    

@@ -18,7 +18,7 @@ class FBL3N(SAPManipulation):
     def gerar_relatorio(self, *,
                         date_partidas_aberto:datetime,
                         date_fechamento:datetime,
-                        path:str=f"C:\\Users\\{getuser()}\\Downloads"                        
+                        path:str=os.path.join(os.getcwd(), "relatorios_sap")
                         ) -> str:
         """Executa a transação no sap e gera o relatorio em seguida salva no caminho especificado e retorna o caminho de onde o arquivo foi salvo
 
@@ -56,16 +56,30 @@ class FBL3N(SAPManipulation):
         self.session.findById("wnd[0]/usr/ctxtPA_STIDA").text = date_partidas_aberto.strftime("%d.%m.%Y")
         self.session.findById("wnd[0]/tbar[1]/btn[8]").press()
         
-        self.session.findById("wnd[0]/usr/cntlGRID1/shellcont/shell/shellcont[1]/shell").setCurrentCell(-1,"AUGBL")
-        self.session.findById("wnd[0]/usr/cntlGRID1/shellcont/shell/shellcont[1]/shell").selectColumn("AUGBL")
-        self.session.findById("wnd[0]/usr/cntlGRID1/shellcont/shell/shellcont[1]/shell").contextMenu()
-        self.session.findById("wnd[0]/usr/cntlGRID1/shellcont/shell/shellcont[1]/shell").selectContextMenuItem("&FILTER")
-        self.session.findById("wnd[1]/tbar[0]/btn[2]").press()
-        self.session.findById("wnd[2]/usr/cntlOPTION_CONTAINER/shellcont/shell").setCurrentCell(1,"TEXT")
-        self.session.findById("wnd[2]/usr/cntlOPTION_CONTAINER/shellcont/shell").selectedRows = "1"
+        #import pdb;pdb.set_trace()
+        self.session.findById("wnd[0]/tbar[1]/btn[38]").press()
+        
+        contador:int = 0
+        while True:
+            try:
+                nome_coluna:str = self.session.findById("wnd[1]/usr/subSUB_CONFIGURATION:SAPLSALV_CUL_FILTER_CRITERIA:0600/cntlCONTAINER1_FILT/shellcont/shell").GetCellValue(contador,"SELTEXT")
+            except:
+                break
+            if nome_coluna == 'Data de lançamento':
+                self.session.findById("wnd[1]/usr/subSUB_CONFIGURATION:SAPLSALV_CUL_FILTER_CRITERIA:0600/cntlCONTAINER1_FILT/shellcont/shell").currentCellRow = contador
+                self.session.findById("wnd[1]/usr/subSUB_CONFIGURATION:SAPLSALV_CUL_FILTER_CRITERIA:0600/cntlCONTAINER1_FILT/shellcont/shell").selectedRows = str(contador)
+                self.session.findById("wnd[1]/usr/subSUB_CONFIGURATION:SAPLSALV_CUL_FILTER_CRITERIA:0600/cntlCONTAINER1_FILT/shellcont/shell").doubleClickCurrentCell()
+                break
+            contador+=1
+                
+        self.session.findById("wnd[1]/usr/subSUB_CONFIGURATION:SAPLSALV_CUL_FILTER_CRITERIA:0600/btn600_BUTTON").press()
+        
+        self.session.findById("wnd[2]").sendVKey(2)
+        self.session.findById("wnd[3]/usr/cntlOPTION_CONTAINER/shellcont/shell").setCurrentCell(1,"TEXT")
+        self.session.findById("wnd[3]/usr/cntlOPTION_CONTAINER/shellcont/shell").selectedRows = "1"
+        self.session.findById("wnd[3]/tbar[0]/btn[0]").press()
+        self.session.findById("wnd[2]/usr/ssub%_SUBSCREEN_FREESEL:SAPLSSEL:1105/ctxt%%DYN001-HIGH").text = date_fechamento.strftime("%d.%m.%Y")
         self.session.findById("wnd[2]/tbar[0]/btn[0]").press()
-        self.session.findById("wnd[1]/usr/ssub%_SUBSCREEN_FREESEL:SAPLSSEL:1105/ctxt%%DYN001-HIGH").text = date_fechamento.strftime("%d.%m.%Y")
-        self.session.findById("wnd[1]/tbar[0]/btn[0]").press()
 
         self.session.findById("wnd[0]/usr/cntlGRID1/shellcont/shell/shellcont[1]/shell").contextMenu()
         self.session.findById("wnd[0]/usr/cntlGRID1/shellcont/shell/shellcont[1]/shell").selectContextMenuItem("&XXL")

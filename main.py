@@ -41,7 +41,7 @@ class Execute(Interface):
         
         #self.__date:datetime = date
         self.__modelo_file_name:str = "MODELO BATCH INPUT.xlsx"
-        super().__init__(version="1.3") # <--------------------------------- Alterar Versão antes de compilar
+        super().__init__(version="1.6") # <--------------------------------- Alterar Versão antes de compilar
         self.setupUi()
         self.__initial_config()
         self.__files_created:dict = {}
@@ -72,7 +72,7 @@ class Execute(Interface):
             
             self.__files_created = ExcelData(date=self.date_partidas_aberto,dados_entrada_path=relatorio_path, modelo_file=self.modelo_path).alimentar_batch_input()
             
-            os.unlink(relatorio_path)
+            #os.unlink(relatorio_path) <---------------------------------
             fechar_excel("Pasta1", wait=2)
             Logs().register(status='Concluido', description="automação encerrou com exito!", exception=None)
             self.ir_pagina_1()
