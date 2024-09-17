@@ -53,6 +53,7 @@ class ExcelData:
     #metodo Principal    
     def alimentar_batch_input(self):
         file_name_saved = self._caminho_salvar()
+        print(file_name_saved)
         modelo_file_path = self.__modelo_file_path
         modelo_file_path_copy = modelo_file_path.replace(".xlsx", "_temp.xlsx")
         copy2(modelo_file_path, modelo_file_path_copy)
@@ -71,20 +72,22 @@ class ExcelData:
         return {"file_name_saved":file_name_saved, "modelo_file_path_copy":modelo_file_path_copy}
     
     def _caminho_salvar(self):
-        # options = {}
-        # options['defaultextension'] = ".xlsx"
-        # options['filetypes'] = [("Arquivos Excel", "*.xlsx"), ("Todos os arquivos", "*.*")]
-        # options['initialfile'] = f"BATCH INPUT {self.date.strftime('%B %Y')}.xlsx"
-        # arquivo_salvar = filedialog.asksaveasfilename(**options)
-        # if  arquivo_salvar == "":
-        #     return f"C:\\Users\\{getuser()}\\Downloads\\MODELO BATCH INPUT.xlsx"
-        options = QFileDialog.Options()
-        defaultFileName = f"BATCH INPUT {self.date.strftime('%B %Y')}.xlsx"
-        arquivo_salvar, _ = QFileDialog.getSaveFileName(None, "Salvar Arquivo", defaultFileName, "Planilhas Excel (*.xlsx)", options=options)
-        print(arquivo_salvar)
+        options = {}
+        options['defaultextension'] = ".xlsx"
+        options['filetypes'] = [("Arquivos Excel", "*.xlsx"), ("Todos os arquivos", "*.*")]
+        options['initialfile'] = f"BATCH INPUT {self.date.strftime('%B %Y')}.xlsx"
+        arquivo_salvar = filedialog.asksaveasfilename(**options)
         if not arquivo_salvar:
-            raise FileNotFoundError("tela para salvar o arquivo foi encerrada sem selecionar o arquivo!")
+            return f"C:\\Users\\{getuser()}\\Downloads\\MODELO BATCH INPUT.xlsx"
         return arquivo_salvar
+        
+        # options = QFileDialog.Options()
+        # defaultFileName = f"BATCH INPUT {self.date.strftime('%B %Y')}.xlsx"
+        # arquivo_salvar, _ = QFileDialog.getSaveFileName(None, "Salvar Arquivo", defaultFileName, "Planilhas Excel (*.xlsx)", options=options)
+        # print(arquivo_salvar)
+        # if not arquivo_salvar:
+        #     raise FileNotFoundError("tela para salvar o arquivo foi encerrada sem selecionar o arquivo!")
+        # return arquivo_salvar
     
     def _alimentar_celular(self, *, wb, sheet:str, lista_alimentar:dict):
         ws:Sheet = wb.sheets[sheet] 
@@ -136,7 +139,7 @@ class ExcelData:
         for row,dados in df.iterrows():
             sequencial += 1
             
-            montante = Classific(dados['Montante em moeda interna'], inverter_nega_posi=True)
+            montante = Classific(dados['Montante em moeda interna'], sem_negativo=True)
             
             #Linha 1
             lista_alimentar["sequencial"].append(sequencial)

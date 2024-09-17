@@ -96,16 +96,18 @@ class Classific:
         else:
             return 'S'
         
-    def __init__(self, value:str|int|float, *, inverter_nega_posi:bool=False) -> None:
-        if inverter_nega_posi:
-            value = -float(value)
+    def __init__(self, value:str|int|float, *, sem_negativo:bool=False) -> None:
+        if sem_negativo:
+            value_temp = float(value)
+            if value_temp < 0:
+                value = -float(value)
         self.__value = value
         new_value:float = float(value)
         self.__newValue:int|float = new_value
     
 
 if __name__ == "__main__":
-    num = Classific(-100, inverter_nega_posi=True)
+    num = Classific(-100, sem_negativo=True)
     print(num.value)
     print(num.chave_primaria,num.chave_secundaria)
     print(num.tipo_conta_primeira,num.tipo_conta_secundaria)

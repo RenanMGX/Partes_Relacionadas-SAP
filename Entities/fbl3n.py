@@ -16,7 +16,8 @@ class FBL3N(SAPManipulation):
         
     @SAPManipulation.start_SAP
     def gerar_relatorio(self, *,
-                        date:datetime,
+                        date_partidas_aberto:datetime,
+                        date_fechamento:datetime,
                         path:str=f"C:\\Users\\{getuser()}\\Downloads"                        
                         ) -> str:
         """Executa a transação no sap e gera o relatorio em seguida salva no caminho especificado e retorna o caminho de onde o arquivo foi salvo
@@ -52,7 +53,7 @@ class FBL3N(SAPManipulation):
         self.session.findById("wnd[1]/usr/txtV-LOW").text = "RAZÃO 2204"
         self.session.findById("wnd[1]/usr/txtENAME-LOW").text = "edias"
         self.session.findById("wnd[1]/tbar[0]/btn[8]").press() 
-        self.session.findById("wnd[0]/usr/ctxtPA_STIDA").text = datetime.now().strftime("%d.%m.%Y")
+        self.session.findById("wnd[0]/usr/ctxtPA_STIDA").text = date_partidas_aberto.strftime("%d.%m.%Y")
         self.session.findById("wnd[0]/tbar[1]/btn[8]").press()
         
         self.session.findById("wnd[0]/usr/cntlGRID1/shellcont/shell/shellcont[1]/shell").setCurrentCell(-1,"AUGBL")
@@ -63,7 +64,7 @@ class FBL3N(SAPManipulation):
         self.session.findById("wnd[2]/usr/cntlOPTION_CONTAINER/shellcont/shell").setCurrentCell(1,"TEXT")
         self.session.findById("wnd[2]/usr/cntlOPTION_CONTAINER/shellcont/shell").selectedRows = "1"
         self.session.findById("wnd[2]/tbar[0]/btn[0]").press()
-        self.session.findById("wnd[1]/usr/ssub%_SUBSCREEN_FREESEL:SAPLSSEL:1105/ctxt%%DYN001-HIGH").text = ultimo_dia_mes(date, forstr="%d.%m.%Y")
+        self.session.findById("wnd[1]/usr/ssub%_SUBSCREEN_FREESEL:SAPLSSEL:1105/ctxt%%DYN001-HIGH").text = date_fechamento.strftime("%d.%m.%Y")
         self.session.findById("wnd[1]/tbar[0]/btn[0]").press()
 
         self.session.findById("wnd[0]/usr/cntlGRID1/shellcont/shell/shellcont[1]/shell").contextMenu()

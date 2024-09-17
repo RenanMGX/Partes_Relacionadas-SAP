@@ -21,63 +21,109 @@ class Interface(QtWidgets.QMainWindow):
         self.setObjectName("Dialog")
         self.resize(524, 370)
         
+        self.largura_dos_botoes = 150
+        
         self.Janelas = QtWidgets.QStackedWidget(self)
-        self.Janelas.setGeometry(QtCore.QRect(10, 10, 501, 351))
+        self.Janelas.setGeometry(QtCore.QRect(10, 10, 501, 410))
         self.Janelas.setObjectName("Janelas")
         
         self.janela_1 = QtWidgets.QWidget()
-        self.janela_1.setObjectName("janela_1")
+        self.janela_1.setObjectName("janela_2")
         
-        self.janela_1_widget_calendario = QtWidgets.QCalendarWidget(self.janela_1)
-        self.janela_1_widget_calendario.setGeometry(QtCore.QRect(80, 10, 341, 211))
-        self.janela_1_widget_calendario.setObjectName("janela_1_widget_calendario")
-        
-        self.janela_1_bt_extrair = QtWidgets.QPushButton(self.janela_1)
-        self.janela_1_bt_extrair.setGeometry(QtCore.QRect(300, 240, 100, 31))
-        self.janela_1_bt_extrair.setObjectName("janela_1_bt_extrairRelatorio")
-        
-        self.janela_1_bt_voltar = QtWidgets.QPushButton(self.janela_1)
-        self.janela_1_bt_voltar.setGeometry(QtCore.QRect(130, 240, 100, 31))
-        self.janela_1_bt_voltar.setObjectName("janela_1_bt_voltar")
-        self.janela_1_bt_voltar.clicked.connect(self.ir_pagina_2)
-        
-        
-        self.janela_1_label_textoInfor = QtWidgets.QLabel(self.janela_1)
-        self.janela_1_label_textoInfor.setGeometry(QtCore.QRect(50, 290, 391, 51))
-        self.janela_1_label_textoInfor.setAlignment(QtCore.Qt.AlignCenter) #type: ignore
-        self.janela_1_label_textoInfor.setObjectName("janela_1_label_textoInfor")
-        self.janela_1_label_textoInfor.setWordWrap(True)
+        self.janela_1_bt_extrairRelatorio = QtWidgets.QPushButton(self.janela_1)
+        self.janela_1_bt_extrairRelatorio.setGeometry(QtCore.QRect(130, 100, 241, 31))
+        self.janela_1_bt_extrairRelatorio.setObjectName("janela_2_bt_extrairRelatorio")
+        self.janela_1_bt_extrairRelatorio.clicked.connect(self.ir_pagina_2)
         
         self.Janelas.addWidget(self.janela_1)
         
         self.janela_2 = QtWidgets.QWidget()
-        self.janela_2.setObjectName("janela_2")
+        self.janela_2.setObjectName("janela_1")
         
-        self.janela_2_bt_extrairRelatorio = QtWidgets.QPushButton(self.janela_2)
-        self.janela_2_bt_extrairRelatorio.setGeometry(QtCore.QRect(130, 100, 241, 31))
-        self.janela_2_bt_extrairRelatorio.setObjectName("janela_2_bt_extrairRelatorio")
-        self.janela_2_bt_extrairRelatorio.clicked.connect(self.ir_pagina_1)
+        self.janela_2_label_titulo = QtWidgets.QLabel(self.janela_2)
+        self.janela_2_label_titulo.setGeometry(QtCore.QRect(50, 0, 391, 30))
+        self.janela_2_label_titulo.setAlignment(QtCore.Qt.AlignCenter) #type: ignore
+        self.janela_2_label_titulo.setObjectName("janela_2_label_titulo")
+        self.janela_2_label_titulo.setStyleSheet("font-size: 14px; font-weight: bold;")
+        self.janela_2_label_titulo.setWordWrap(True)
+        #self.janela_1_label_descri_calendario.setStyleSheet("border: 1px solid black;")
         
+        self.janela_2_widget_calendario_partidas_aberto = QtWidgets.QCalendarWidget(self.janela_2)
+        self.janela_2_widget_calendario_partidas_aberto.setGeometry(QtCore.QRect(80, 30, 341, 211))
+        self.janela_2_widget_calendario_partidas_aberto.setObjectName("janela_2_widget_calendario")
         
+        self.janela_2_bt_voltar = QtWidgets.QPushButton(self.janela_2)
+        self.janela_2_bt_voltar.setGeometry(QtCore.QRect(50, 260, self.largura_dos_botoes, 31))
+        self.janela_2_bt_voltar.setObjectName("janela_2_bt_voltar")
+        self.janela_2_bt_voltar.clicked.connect(self.ir_pagina_1)
+        
+        self.janela_2_bt_avancar = QtWidgets.QPushButton(self.janela_2)
+        self.janela_2_bt_avancar.setGeometry(QtCore.QRect(300, 260, self.largura_dos_botoes, 31))
+        self.janela_2_bt_avancar.setObjectName("janela_2_bt_avancar")
+        self.janela_2_bt_avancar.clicked.connect(self.ir_pagina_3)
+                
         self.Janelas.addWidget(self.janela_2)
+        
+        
+        self.janela_3 = QtWidgets.QWidget()
+        self.janela_3.setObjectName("janela_3")
+
+        self.janela_3_label_titulo = QtWidgets.QLabel(self.janela_3)
+        self.janela_3_label_titulo.setGeometry(QtCore.QRect(50, 0, 391, 30))
+        self.janela_3_label_titulo.setAlignment(QtCore.Qt.AlignCenter) #type: ignore
+        self.janela_3_label_titulo.setObjectName("janela_3_label_titulo")
+        self.janela_3_label_titulo.setStyleSheet("font-size: 14px; font-weight: bold;")
+        self.janela_3_label_titulo.setWordWrap(True)
+        #self.janela_1_label_descri_calendario.setStyleSheet("border: 1px solid black;")
+        
+        self.janela_3_widget_calendario_fechamento = QtWidgets.QCalendarWidget(self.janela_3)
+        self.janela_3_widget_calendario_fechamento.setGeometry(QtCore.QRect(80, 30, 341, 211))
+        self.janela_3_widget_calendario_fechamento.setObjectName("janela_3_widget_calendario_fechamento")
+        
+        
+        self.janela_3_bt_voltar = QtWidgets.QPushButton(self.janela_3)
+        self.janela_3_bt_voltar.setGeometry(QtCore.QRect(50, 260, self.largura_dos_botoes, 31))
+        self.janela_3_bt_voltar.setObjectName("janela_3_bt_voltar")
+        self.janela_3_bt_voltar.clicked.connect(self.ir_pagina_2)
+   
+        self.janela_3_bt_extrair = QtWidgets.QPushButton(self.janela_3)
+        self.janela_3_bt_extrair.setGeometry(QtCore.QRect(300, 260, self.largura_dos_botoes, 31))
+        self.janela_3_bt_extrair.setObjectName("janela_1_bt_extrairRelatorio")
+        
+        self.janela_3_label_textoInfor = QtWidgets.QLabel(self.janela_3)
+        self.janela_3_label_textoInfor.setGeometry(QtCore.QRect(50, 295, 400, 51))
+        self.janela_3_label_textoInfor.setAlignment(QtCore.Qt.AlignCenter) #type: ignore
+        self.janela_3_label_textoInfor.setObjectName("janela_3_label_textoInfor")
+        self.janela_3_label_textoInfor.setWordWrap(True)
+        self.janela_3_label_textoInfor.setStyleSheet("border: 1px solid black;")
+        
+        self.Janelas.addWidget(self.janela_3)
+
 
         self.retranslateUi()
-        self.Janelas.setCurrentIndex(1)
+        self.Janelas.setCurrentIndex(0) # padrão 1
         QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_translate("Dialog", f"Partes Relacionadas {self.__version}"))
-        self.janela_1_bt_extrair.setText(_translate("Dialog", "Extrair"))
-        self.janela_1_bt_voltar.setText(_translate("Dialog", "Voltar"))
-        self.janela_1_label_textoInfor.setText(_translate("Dialog", ""))
-        self.janela_2_bt_extrairRelatorio.setText(_translate("Dialog", "Extrair Relatorio"))
+        self.janela_1_bt_extrairRelatorio.setText(_translate("Dialog", "Extrair Relatorio"))
+        self.janela_2_bt_avancar.setText(_translate("Dialog", "Avançar"))
+        self.janela_2_bt_voltar.setText(_translate("Dialog", "Voltar"))
+        self.janela_2_label_titulo.setText(_translate("Dialog", "Selecione a data das Partidas em Aberto:"))
+        self.janela_3_label_titulo.setText(_translate("Dialog", "Selecione a data do fechamento:"))
+        self.janela_3_bt_extrair.setText(_translate("Dialog", "Extrair"))
+        self.janela_3_bt_voltar.setText(_translate("Dialog", "Voltar"))
+        self.janela_3_label_textoInfor.setText(_translate("Dialog", ""))
         
     def ir_pagina_1(self):
         self.Janelas.setCurrentIndex(0)
         
     def ir_pagina_2(self):
         self.Janelas.setCurrentIndex(1)
+        
+    def ir_pagina_3(self):
+        self.Janelas.setCurrentIndex(2)
     
     # def openFileNameDialog(self):
     #     options = QtWidgets.QFileDialog.Options()

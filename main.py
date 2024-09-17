@@ -24,8 +24,13 @@ class Execute(Interface):
         return modelo_path
     
     @property
-    def date(self) -> datetime:
-        date = self.janela_1_widget_calendario.selectedDate()
+    def date_partidas_aberto(self) -> datetime:
+        date = self.janela_2_widget_calendario_partidas_aberto.selectedDate()
+        return datetime(date.year(), date.month(), date.day())
+    
+    @property
+    def date_fechamento(self) -> datetime:
+        date = self.janela_3_widget_calendario_fechamento.selectedDate()
         return datetime(date.year(), date.month(), date.day())
 
     def __init__(self, 
@@ -36,7 +41,7 @@ class Execute(Interface):
         
         #self.__date:datetime = date
         self.__modelo_file_name:str = "MODELO BATCH INPUT.xlsx"
-        super().__init__(version="1.0") # <--------------------------------- Alterar Versão antes de compilar
+        super().__init__(version="1.3") # <--------------------------------- Alterar Versão antes de compilar
         self.setupUi()
         self.__initial_config()
         self.__files_created:dict = {}
@@ -49,31 +54,35 @@ class Execute(Interface):
         event.accept()  # Isso irá fechar a janela
     
     def __initial_config(self):
-        self.janela_1_bt_extrair.clicked.connect(self.execute)
+        self.janela_3_bt_extrair.clicked.connect(self.execute)
         
     def test(self, *, t):
-        print(self.date)
+        print(self.date_partidas_aberto, self.date_fechamento)
     
     def execute(self, *,trace_back:bool=True):
         
         # if isinstance(self.modelo_path, FileNotFoundError):
         #     raise FileNotFoundError(f"Modelo Batch Input é necessario para continuar")
         
-        self.showMinimized()
-        self.janela_1_label_textoInfor.setText("")
+        #self.showMinimized()
+        self.hide()
+        self.janela_3_label_textoInfor.setText("")
         try:
-            relatorio_path = FBL3N().gerar_relatorio(date=self.date)
+            relatorio_path = FBL3N().gerar_relatorio(date_partidas_aberto=self.date_partidas_aberto, date_fechamento=self.date_fechamento)
             
-            self.__files_created = ExcelData(date=self.date,dados_entrada_path=relatorio_path, modelo_file=self.modelo_path).alimentar_batch_input()
+            self.__files_created = ExcelData(date=self.date_partidas_aberto,dados_entrada_path=relatorio_path, modelo_file=self.modelo_path).alimentar_batch_input()
             
             os.unlink(relatorio_path)
             fechar_excel("Pasta1", wait=2)
             Logs().register(status='Concluido', description="automação encerrou com exito!", exception=None)
+            self.ir_pagina_1()
         except Exception as error:
-            self.janela_1_label_textoInfor.setText(str(error))
+            self.janela_3_label_textoInfor.setText(str(error))
             Logs().register(status='Error', description=str(error), exception=traceback.format_exc())
         finally:
             #self.ir_pagina_2()
+            self.show()
+            self.showMinimized()
             self.showNormal()
             
                  
